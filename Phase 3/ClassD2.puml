@@ -1,0 +1,149 @@
+@startuml
+package smd_hw{
+skinparam linetype ortho
+left to right direction
+
+
+'------Main-------
+   class AdapterMain {
+        {static} +main(args: String[]): void
+    }
+'-----Interfaces------
+
+interface ShapeBasic <<interface>> {
+        +draw(): void
+        +grow(): void
+        +printText(): String
+        +isVisible(): boolean
+    }
+
+    
+    
+interface ShapeSpecial <<interface>> {
+    {abstract}+calculateArea(): double
+   {abstract} +calculatePerimeter(): double
+    {abstract}+drawShape(): void
+}
+
+interface CanBeColored <<interface>> {
+    +setColor(c: String): String {default}
+    {abstract} +getColor(): String
+}
+
+
+'------ Abstract -----
+  abstract class Visibility {
+        -inBackground: boolean = false
+        +Visibility()
+        +changeVisibility(): void
+        +isVisible(): boolean
+    }
+    
+    abstract class Drawing<T> {
+    - shapes : List<T> = new ArrayList<>
+
+    + Drawing()
+    + addBasicShape(T:T) : void
+    + getBasicShapes() : List<T>
+    {abstract} + draw() : void
+}
+    
+    
+
+
+'------Classes------
+
+  class Rectangle extends Visibility implements ShapeBasic{
+        +Rectangle()
+        +draw(): void
+        +grow(): void
+        +printText(): String
+    }
+
+    class Circle extends Visibility implements ShapeBasic{
+        +Circle()
+        +draw(): void
+        +grow(): void
+        +printText(): String
+    }
+    
+     class ShapeDrawer extends Drawing<ShapeBasic>{
+        +ShapeDrawer()
+        +draw(): void
+        +grow(): void
+        +showVisibility(): void
+    }
+    
+    class ShapeAdapter extends Visibility implements ShapeBasic{
+        -shape: ShapeSpecial
+        +ShapeAdapter(s: ShapeSpecial)
+        +draw(): void
+        +grow(): void
+        +printText(): String
+    }
+    
+    class ShapeDiamond implements ShapeSpecial, CanBeColored{
+        -a: double = 2.0
+        -b: double = 2.0
+        {static}-df2: DecimalFormat = new DecimalFormat"#.##"
+        -color: String = "No color"
+        +ShapeDiamond()
+        +ShapeDiamond(color: String)
+        +ShapeDiamond(a: double, b: double)
+        +ShapeDiamond(a: double, b: double, color: String)
+        +calculateArea(): double
+        +calculatePerimeter(): double
+        +drawShape(): void
+        +setColor(color: String): String
+        +getColor(): String
+    }
+
+
+ class Triangle implements ShapeSpecial, CanBeColored{
+        -a: double = 3.0
+        -b: double = 3.0
+        -c: double = 3.0
+        {static} -df2: DecimalFormat = new DecimalFormat"#.##"
+        -color: String = "No color"
+        +Triangle()
+        +Triangle(color: String)
+        +Triangle(a: double, b: double, c: double)
+        +Triangle(a: double, b: double, c: double, color: String)
+        +calculateArea(): double
+        +calculatePerimeter(): double
+        +drawShape(): void
+        +setColor(color: String): String
+        +getColor(): String
+    }
+
+
+
+
+
+
+
+'----Extends---
+'Circle -----|> Visibility : extends
+
+'-----Implements--
+'Circle ..|> ShapeBasic : implements
+
+
+'------Aggregations---
+ShapeBasic  ----o "0...*" Drawing
+
+
+
+'----Dependencies----
+ShapeAdapter ---> "0...1" ShapeSpecial : adapts
+
+AdapterMain ----> ShapeDrawer : use
+
+
+
+
+'ShapeAdapter ..up.|> ShapeBasic
+
+
+}
+@enduml
